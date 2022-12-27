@@ -1,14 +1,16 @@
 @echo off
 echo - generating Makefile in src...
 src\mkfiles\mkmake WIN32 MINGW32 DLL < src\mkfiles\makefile.all > src\Makefile
+copy src\slconfig.h src\config.h
 
 echo - generating Makefile in slsh...
 src\mkfiles\mkmake WIN32 MINGW32 DLL < slsh\mkfiles\makefile.all > slsh\Makefile
+copy src\slconfig.h modules\config.h
 
 echo - generating Makefile in modules...
 src\mkfiles\mkmake WIN32 MINGW32 DLL < modules\mkfiles\makefile.all > modules\Makefile
+copy src\slconfig.h modules\config.h
 
-copy src\slconfig.h src\config.h
 copy mkfiles\makefile.m32 Makefile
 
 echo Now run mingw32-make to build the library.  But first, you should

@@ -7,6 +7,8 @@ Changes since 2.3.3
    SLang_reset_tty function on windows systems
 3. src/_slint.h: On windows sytems, use %lld and %llu for long long
    integer formats
+4. mkfiles/m32init.bat: Copy config file to module and slsh
+   subdirectories (windows-specific)
 
 Changes since 2.3.2
 1. src/slposdir.c: stat_file now support open file descriptors, in
