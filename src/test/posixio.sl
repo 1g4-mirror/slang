@@ -21,7 +21,6 @@ define run_tests (some_text)
 	fp2 = fdopen (fd, "wb");
 	if ((fp1 == NULL) || (fp2 == NULL))
 	  failed ("fdopen");
-
 	if (isatty (fileno (fp1)))
 	  failed ("isatty (fileno)");
      }
@@ -47,6 +46,7 @@ define run_tests (some_text)
    if (bstrlen (new_text))
      failed ("read at EOF");
 
+#ifexists flock
    if (0 == flock (fd, LOCK_EX))
      {
 	variable fp = fopen (file, "r");
@@ -63,6 +63,7 @@ define run_tests (some_text)
      {
 	failed ("flock LOCK_UN: %S", errno_string());
      }
+#endif
 
    if (-1 == _close (_fileno(fd))) failed ("_close after tests");
    if (0 == close (fd))
@@ -73,10 +74,10 @@ define run_tests (some_text)
    () = remove (file);
    if (stat_file (file) != NULL) failed ("remove");
 }
-
 run_tests ("ABCDEFG");
 run_tests ("A\000BC\000\n\n\n");
 
+#ifndef WIN32
 variable fd = open ("/dev/tty", O_RDONLY);
 if (fd != NULL)
 {
@@ -84,6 +85,7 @@ if (fd != NULL)
      failed ("isatty");
 }
 fd = 0;
+#endif
 
 if (fileno (stdin) != fileno(stdin))
 {
@@ -120,8 +122,9 @@ private define test_misc ()
    if (fd1 == fd)
      failed ("dup_fd did not return a duplicate");
    () = close (fd1);
-   if (123 != dup2_fd (fd, 123))
-     failed ("dup2_fd failed to return a specified descriptor: %S", errno_string());
+   variable ret = dup2_fd (fd, 123);
+   if (123 != ret)
+     failed ("dup2_fd returned %S instead of %S: %S", ret, 123, errno_string());
 
    fd1 = @FD_Type(123);
    if (_fileno (fd1) != 123)

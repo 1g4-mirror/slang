@@ -9,6 +9,9 @@ Changes since 2.3.3
    integer formats
 4. mkfiles/m32init.bat: Copy config file to module and slsh
    subdirectories (windows-specific)
+5. src/slposio.c: Added a window-specific tweak so that dup2 returns
+   the duped file descriptor.  Also updated the regresssion tests
+   (window-specific).
 
 Changes since 2.3.2
 1. src/slposdir.c: stat_file now support open file descriptors, in

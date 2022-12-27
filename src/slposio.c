@@ -611,6 +611,12 @@ static int SLfile_dup2_fd (SLFile_FD_Type *f0, int newfd)
 
 	return -1;
      }
+   /* On windows, dup2 returns 0 to indicate success.
+    * See <https://osdn.net/projects/mingw/ticket/42561>
+    */
+#ifdef __WIN32__
+   fd = newfd;
+#endif
    return fd;
 }
 

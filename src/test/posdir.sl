@@ -47,9 +47,14 @@ test_posdir ();
 
 private define compare_stat (st, st1)
 {
-   if ((st1.st_dev != st.st_dev)
-       || (st1.st_ino != st.st_ino))
-     failed ("stat compare");
+   % This used to compare st_dev and st_ino, but
+   % windows does not really use those and were always unset
+   % when using fstat.
+   if ((st1.st_ctime != st.st_ctime)
+       || (st1.st_uid != st.st_uid))
+     failed ("stat compare: (%S,%S) != (%S,%S)",
+	     st1.st_ctime, st1.st_uid,
+	     st.st_ctime, st.st_uid);
 }
 
 private define test_non_exist_file_ops ()
@@ -68,6 +73,7 @@ private define test_non_exist_file_ops ()
    st1 = stat_file (fileno(fp));
    if (st1 == NULL) failed ("stat_file fileno(fp)");
    compare_stat (st, st1);
+   () = fclose (fp);
 
    variable tmpfile1 = tmpfile + "-tmp";
    variable tmpdir = util_make_tmp_dir ("tmpdir");
@@ -143,9 +149,13 @@ private define test_non_exist_file_ops ()
    st = stat_file (tmpfile);
    if (st == NULL)
      failed ("stat_file %s failed: %s", tmpfile, errno_string());
+# ifndef WIN32
+   % See <https://unix.stackexchange.com/questions/549908/chmod-not-working-in-mingw64-but-working-cygwin>
+   % for why this check is skipped
    if ((st.st_mode&0777) != S_IWUSR)
      failed ("chmod %s mode=%d does not match stat_file mode=%d",
 	     tmpfile, S_IWUSR, st.st_mode);
+# endif
    if (-1 != chmod (badfile, S_IWUSR))
      failed ("expected chmod to fail on a non-existent file");
 #endif

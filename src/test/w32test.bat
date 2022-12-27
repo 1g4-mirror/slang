@@ -1,4 +1,4 @@
-gcc -I.. -DSLANG_DLL=1 -DWIN32 -L..\gw32objs sltest.c -lslang -luser32
+gcc -I.. -DSLANG_DLL=1 -DWIN32 -L..\gw32objs sltest.c -o sltest -lslang
 sltest argv.sl
 sltest syntax.sl
 sltest scircuit.sl

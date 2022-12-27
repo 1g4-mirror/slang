@@ -72,8 +72,11 @@ test_mktime ();
 private define test_other ()
 {
    % Just test the calling syntax on these.
-   tic(); _tic();
-   variable n1 = toc(), n2 = _toc();
+   tic();
+   variable n1 = toc();
+#ifexists _tic
+   _tic(); () = _toc();
+#endif
 
    variable secs = 1000000;
    if (typeof (ctime (secs)) != String_Type)
