@@ -54,6 +54,7 @@ static void set_ctrl_break (int state)
 \*----------------------------------------------------------------------*/
 
 HANDLE SLw32_Hstdin = INVALID_HANDLE_VALUE;
+static DWORD Old_Console_Mode = 0;
 
 int SLang_init_tty (int abort_char, int no_flow_control, int opost)
 {
@@ -77,6 +78,7 @@ int SLang_init_tty (int abort_char, int no_flow_control, int opost)
      return -1;
 #endif
 
+   GetConsoleMode (SLw32_Hstdin, &Old_Console_Mode);
    if (FALSE == SetConsoleMode(SLw32_Hstdin, ENABLE_WINDOW_INPUT|ENABLE_MOUSE_INPUT))
      {
 	SLw32_Hstdin = INVALID_HANDLE_VALUE;
@@ -97,7 +99,12 @@ int SLang_init_tty (int abort_char, int no_flow_control, int opost)
 \*----------------------------------------------------------------------*/
 void SLang_reset_tty (void)
 {
-   SLw32_Hstdin = INVALID_HANDLE_VALUE;
+   if (SLw32_Hstdin != INVALID_HANDLE_VALUE)
+     {
+	SetConsoleMode (SLw32_Hstdin, Old_Console_Mode);
+	CloseHandle (SLw32_Hstdin);
+	SLw32_Hstdin = INVALID_HANDLE_VALUE;
+     }
    set_ctrl_break (1);
 }
 
