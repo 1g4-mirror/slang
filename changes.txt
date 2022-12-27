@@ -5,6 +5,8 @@ Changes since 2.3.3
    systems such as MS windows.
 2. src/slw32tty.c: The console mode was not getting reset by the
    SLang_reset_tty function on windows systems
+3. src/_slint.h: On windows sytems, use %lld and %llu for long long
+   integer formats
 
 Changes since 2.3.2
 1. src/slposdir.c: stat_file now support open file descriptors, in

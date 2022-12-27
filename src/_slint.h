@@ -152,13 +152,8 @@ extern int _pSLang_pop_uint64 (_pSLuint64_Type *);
 #endif
 
 #ifdef HAVE_LONG_LONG
-# ifdef __WIN32__
-#  define SLFMT_LLD  "%I64d"
-#  define SLFMT_LLU  "%I64u"
-# else
-#  define SLFMT_LLD  "%lld"
-#  define SLFMT_LLU  "%llu"
-# endif
+# define SLFMT_LLD  "%lld"
+# define SLFMT_LLU  "%llu"
 #endif
 
 #endif				       /* PRIVATE_SLINT_H_ */
