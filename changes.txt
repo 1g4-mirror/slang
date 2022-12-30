@@ -12,6 +12,10 @@ Changes since 2.3.3
 5. src/slposio.c: Added a window-specific tweak so that dup2 returns
    the duped file descriptor.  Also updated the regresssion tests
    (window-specific).
+6. src/slvideo.c: On windows, make calls to SetConsoleScreenBufferSize
+   and SetConsoleWindowInfo after calling CreateConsoleScreenBuffer so
+   that the newly created console will have the correct size.  Also
+   INSTALL.pc was updated (windows-specific)
 
 Changes since 2.3.2
 1. src/slposdir.c: stat_file now support open file descriptors, in

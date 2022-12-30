@@ -39,6 +39,6 @@ clean:
 # If the command below fails with an error message involving /usr/bin/sh, then
 # change "mkfiles\runslsh.bat" to "mkfiles/runslsh.bat"
 install: all
-	mkfiles\runslsh.bat mkfiles/install.sl --destdir="X-$(DESTDIR)" --prefix="$(PREFIX)" install
+	mkfiles/runslsh.bat mkfiles/install.sl --destdir="X-$(DESTDIR)" --prefix="$(PREFIX)" install
 #
 .PHONY: all install clean

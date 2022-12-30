@@ -1530,20 +1530,28 @@ static int Save_Code_Page = 0;
 static int win32_init (void)
 {
    SECURITY_ATTRIBUTES sec;
+   COORD xy;
+   SMALL_RECT rect;
+
+   SLtt_get_screen_size ();
 
    memset ((char *) &sec, 0, sizeof(SECURITY_ATTRIBUTES));
    sec.nLength = sizeof (SECURITY_ATTRIBUTES);
    sec.bInheritHandle = FALSE;
-
+#if 1
    hStdout = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
 				       FILE_SHARE_READ|FILE_SHARE_WRITE,
 				       &sec,
 				       CONSOLE_TEXTMODE_BUFFER,
 				       0);
-
    if (hStdout == INVALID_HANDLE_VALUE)
      return -1;
-
+   xy.X = SLtt_Screen_Cols;
+   xy.Y = SLtt_Screen_Rows;
+   rect.Right = SLtt_Screen_Cols-1;
+   rect.Bottom = SLtt_Screen_Rows-1;
+   SetConsoleScreenBufferSize (hStdout, xy);
+   SetConsoleWindowInfo(hStdout, TRUE, &rect);
    if ((FALSE == SetConsoleActiveScreenBuffer(hStdout))
        || (FALSE == SetConsoleMode(hStdout, 0))
        || (-1 == win32_resize ()))
@@ -1551,7 +1559,9 @@ static int win32_init (void)
 	SLtt_reset_video ();
 	return -1;
      }
-
+#else
+   hStdout = GetStdHandle (STD_OUTPUT_HANDLE);
+#endif
    Save_Code_Page = GetConsoleOutputCP ();
    if (_pSLtt_UTF8_Mode)
      {
@@ -1586,6 +1596,8 @@ int SLtt_init_video (void)
 
 int SLtt_reset_video (void)
 {
+   HANDLE h;
+
    if (hStdout == INVALID_HANDLE_VALUE)
      return 0;
 
@@ -1594,11 +1606,13 @@ int SLtt_reset_video (void)
    Attribute_Byte = 0x7;
    Current_Color = JNO_COLOR;
    SLtt_del_eol ();
-   (void) CloseHandle (hStdout);
 
-   hStdout = GetStdHandle (STD_OUTPUT_HANDLE);
-   if (hStdout != INVALID_HANDLE_VALUE)
-     (void) SetConsoleActiveScreenBuffer(hStdout);
+   h = GetStdHandle (STD_OUTPUT_HANDLE);
+   if (h != hStdout)
+     (void) CloseHandle (hStdout);
+
+   if (h != INVALID_HANDLE_VALUE)
+     (void) SetConsoleActiveScreenBuffer(h);
 
    hStdout = INVALID_HANDLE_VALUE;
    (void) SetConsoleOutputCP (Save_Code_Page);
@@ -2393,13 +2407,13 @@ int SLtt_set_mono (int obj_unused, SLFUTURE_CONST char *unused, SLtt_Char_Type c
    return 0;
 }
 
-#if 0
-void SLtt_add_color_attribute (int obj, SLtt_Char_Type attr)
+int SLtt_add_color_attribute (int obj, SLtt_Char_Type attr)
 {
+   /* Not implemented */
    (void) obj;
    (void) attr;
+   return 0;
 }
-#endif
 
 int SLtt_utf8_enable (int mode)
 {
