@@ -36,9 +36,11 @@ clean:
 # As a major hack, I added the X- prefix and modified mkfiles/install.sl
 # to remove the X-.
 #
-# If the command below fails with an error message involving /usr/bin/sh, then
-# change "mkfiles\runslsh.bat" to "mkfiles/runslsh.bat"
+# Note also that there are 2 variants of the install target.  Some versions
+# of mingw32-make understand one and not the other.
 install: all
+	mkfiles\runslsh.bat mkfiles/install.sl --destdir="X-$(DESTDIR)" --prefix="$(PREFIX)" install
+install1: all
 	mkfiles/runslsh.bat mkfiles/install.sl --destdir="X-$(DESTDIR)" --prefix="$(PREFIX)" install
 #
 .PHONY: all install clean

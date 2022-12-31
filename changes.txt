@@ -16,6 +16,10 @@ Changes since 2.3.3
    and SetConsoleWindowInfo after calling CreateConsoleScreenBuffer so
    that the newly created console will have the correct size.  Also
    INSTALL.pc was updated (windows-specific)
+7. mkfiles/makefile.m32: Added install1 target to work with versions
+   of mingw make that cannot process the install target.  Previously
+   this required editing the makefile (windows specific)
+
 
 Changes since 2.3.2
 1. src/slposdir.c: stat_file now support open file descriptors, in
