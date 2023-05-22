@@ -135,6 +135,12 @@ static char *ctime_cmd (void)
 #else
    t = ctime (&tt);
 #endif
+   if (t == NULL)
+     {
+	SLerrno_set_errno (errno);
+	return NULL;
+     }
+
    t[24] = 0;  /* knock off \n */
    return (t);
 }
