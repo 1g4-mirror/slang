@@ -1,4 +1,4 @@
-# These are the version 9 files from <ftp://ftp.unicode.org/Public/UNIDATA/>
+# These are the version 15 files from <ftp://ftp.unicode.org/Public/UNIDATA/>
 UNICODEDATA = UnicodeData.txt EastAsianWidth.txt
 
 TABLES = slupper.h sllower.h slischar.h slcombin.h slwcwidth.h
