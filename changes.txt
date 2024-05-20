@@ -29,7 +29,8 @@ Changes since 2.3.3
 13. src/sldisply.c: Initialize the variables provided by the %g
     operator to zero to not leak uninitialized data from the stack if
     not set by %P. (Miroslav Lichvar)
-
+14. modules/fcntl-module.c: Added fcntl_getpipe_sz and
+    fcntl_setpipe_sz functions to get and set the buffer size for pipes
 
 {{{ Previous Versions
 
