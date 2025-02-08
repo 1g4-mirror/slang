@@ -35,6 +35,8 @@ Changes since 2.3.3
     expand_escaped_string function and json module
 16. src/{keymap.c,sltoken.c}: Removed unnecessary chack for a NULL
     string, and corrected a potential memory leak (Miroslav Lichvar)
+17. autoconf/scripts/getsyslibs.sh: Handle files with relative path
+    names
 
 {{{ Previous Versions
 
