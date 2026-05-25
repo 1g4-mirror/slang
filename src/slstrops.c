@@ -3091,7 +3091,10 @@ static void wchars_to_string (void)
 	  {
 	     unsigned char *newbuf;
 
-	     dlen = 6;
+	     /* A multi-byte character has been encountered.  There are probably more
+	      * to come.  So allocate extra space for those assuming 3 bytes per character
+	      */
+	     dlen = SLUTF8_MAX_MBLEN + 3*(n-i);
 	     if (NULL == (newbuf = (unsigned char *)SLrealloc ((char *)buf, buflen+dlen+1)))
 	       {
 		  SLfree ((char *)buf);
@@ -3101,7 +3104,7 @@ static void wchars_to_string (void)
 	     b = newbuf + (b-buf);
 	     buf = newbuf;
 	     buflen += dlen;
-	     bmax = b + buflen;
+	     bmax = buf + buflen;
 	  }
 	b = SLutf8_encode (wch, b, SLUTF8_MAX_MBLEN);
      }
