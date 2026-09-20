@@ -53,6 +53,9 @@ Changes since 2.3.3
     so a safety check was implemented to enforce this restriction.
     (thanks go to Morten Bo Johansen for helping)
 24. src/slang.h: Added a define for SLANG_SIZEOF_LONG
+25. modules/chksum.sl+related files: Added 64bit CRC routines and the hmacsum
+    function to complement hmac_new/close functions.  The 64 bit CRC
+    algorthms include: XZ(default), NVME, EMCA-182, and GO-ISO.
 
 {{{ Previous Versions
 
