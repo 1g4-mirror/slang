@@ -52,6 +52,7 @@ Changes since 2.3.3
 23. src/slerr.c: print_queue was not designed to support reentrancy,
     so a safety check was implemented to enforce this restriction.
     (thanks go to Morten Bo Johansen for helping)
+24. src/slang.h: Added a define for SLANG_SIZEOF_LONG
 
 {{{ Previous Versions
 
