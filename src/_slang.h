@@ -1538,7 +1538,7 @@ extern int _pSLang_check_signals_hook (VOID_STAR);
  */
 static _INLINE_ int uint_sum_overflow (size_t a, size_t b, size_t *cp)
 {
-# if _SL_HAS_BUILTIN_OVERFLOW
+# ifdef _SL_HAS_BUILTIN_OVERFLOW
    unsigned int _tmp_res;
    if (__builtin_add_overflow(a, b, &_tmp_res)) return 1;
    *cp = _tmp_res;

@@ -59,6 +59,9 @@ Changes since 2.3.3
 26. A number of unsigned integer overflow checks were added to fix potential
     memory corruption issues identified by Claude AI. (Thanks go to Miroslav
     Lichvar for sending me the report)
+27. src/_slang.h: Changed `#if _SL_HAS_BUILTIN_OVERFLOW` to `#ifdef _SL_HAS_BUILTIN_OVERFLOW`
+
+
 
 {{{ Previous Versions
 
