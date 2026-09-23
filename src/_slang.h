@@ -1520,6 +1520,41 @@ extern int _pSLang_check_signals_hook (VOID_STAR);
 # define IF_UNLIKELY(x) if (x)
 #endif
 
+#if SLANG_OPTIMIZE_FOR_SPEED
+# ifdef __has_builtin
+#  if __has_builtin(__builtin_add_overflow)
+#   define _SL_HAS_BUILTIN_OVERFLOW 1
+#  endif
+# else
+#  if (defined(__GNUC__) && (__GNUC__ >= 5))
+#   define _SL_HAS_BUILTIN_OVERFLOW 1
+#  endif
+# endif
+#endif
+
+#ifdef NEED_CHECK_UINT_OVERFLOW
+/* Add a and b to produce c.  If the sum overflows that of an unsigned int return 1.
+ * Otherwise, assign *cp = c and return 0
+ */
+static _INLINE_ int uint_sum_overflow (size_t a, size_t b, size_t *cp)
+{
+# if _SL_HAS_BUILTIN_OVERFLOW
+   unsigned int _tmp_res;
+   if (__builtin_add_overflow(a, b, &_tmp_res)) return 1;
+   *cp = _tmp_res;
+   return 0;
+# else
+   size_t c;
+   unsigned int uint_max = ~((unsigned int)0);
+
+   c = a + b;
+   IF_UNLIKELY((c < a) || (c > uint_max)) return 1;
+   *cp = c;
+   return 0;
+# endif
+}
+#endif
+
 /* This is a macro that permits:
  *
  *   extern fun (void **addr);

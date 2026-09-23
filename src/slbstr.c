@@ -22,6 +22,7 @@ USA.
 #include "slinclud.h"
 
 #include "slang.h"
+#define NEED_CHECK_UINT_OVERFLOW 1
 #include "_slang.h"
 
 struct _pSLang_BString_Type
@@ -775,12 +776,14 @@ static SLang_BString_Type *join_bstrings (SLang_BString_Type **data, SLuindex_Ty
 	if (NULL == SLbstring_get_pointer (data[i], &dlen))
 	  return NULL;
 
-	len += dlen;
+	if (uint_sum_overflow (len, dlen, &len))
+	  {
+	     SLang_set_error (SL_Malloc_Error);
+	     return NULL;
+	  }
      }
-
-   len += (num-1) * delim_len;
-
-   if (len != (SLstrlen_Type)len)
+   dlen = (num-1) * delim_len;
+   if (uint_sum_overflow (len, dlen, &len))
      {
 	SLang_set_error (SL_Malloc_Error);
 	return NULL;

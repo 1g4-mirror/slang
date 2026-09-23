@@ -46,6 +46,7 @@ USA.
 #endif
 
 #include "slang.h"
+#define NEED_CHECK_UINT_OVERFLOW
 #include "_slang.h"
 
 /*}}}*/
@@ -1867,6 +1868,40 @@ static void strcompress_vintrin (char *white) /*{{{*/
 
 /*}}}*/
 
+static int check_and_resize_buffer (char **bufp, size_t *buflenp,
+				    size_t len, size_t dlen, size_t *len1p)
+{
+   char *buf, *newbuf;
+   size_t len1, buflen = *buflenp;
+
+   /* We require buflen >= len+dlen+1 accounting for trailing \0
+    * This is equivalent to buflen > len+dlen = len1
+    */
+   if (uint_sum_overflow(len, dlen, &len1))
+     {
+	SLang_set_error (SL_MALLOC_ERROR);
+	return -1;
+     }
+   *len1p = len1;
+
+   if (buflen > len1)
+     return 0;
+
+   /* Allocate an additional 512 bytes beyond the required space */
+   if (uint_sum_overflow(len1, 512, &buflen))
+     {
+	SLang_set_error (SL_MALLOC_ERROR);
+	return -1;
+     }
+   buf = *bufp;
+   if (NULL == (newbuf = (char *)SLrealloc(buf, buflen)))   /* buf==NULL is ok */
+     return -1;
+
+   *buflenp = buflen;
+   *bufp = newbuf;
+   return 0;
+}
+
 #if defined(__GNUC__)
 # pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
@@ -1883,7 +1918,7 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 #ifdef HAVE_LONG_LONG
    long long llong_var;
 #endif
-   size_t len = 0, malloc_len = 0, dlen;
+   size_t len = 0, len1, malloc_len = 0, dlen;
    int do_free;
    unsigned int guess_size;
 #if SLANG_HAS_FLOAT
@@ -1907,21 +1942,13 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 
 	/* p points at '%' or 0 */
 
-	dlen = (unsigned int) (p - fmt);
-
-	if (len + dlen >= malloc_len)
-	  {
-	     malloc_len = len + dlen + 512;
-	     if (out == NULL) outp = (char *)SLmalloc(malloc_len + 1);
-	     else outp = (char *)SLrealloc(out, malloc_len + 1);
-	     if (NULL == outp)
-	       return out;
-	     out = outp;
-	     outp = out + len;
-	  }
-
+	dlen = (p - fmt);
+	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, dlen, &len1))
+	  return out;
+	/* len1 is len+dlen */
+	outp = out + len;
 	strncpy(outp, fmt, dlen);
-	len += dlen;
+	len = len1;
 	outp = out + len;
 	*outp = 0;
 	if (ch == 0) break;
@@ -2179,19 +2206,9 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 	width = width + precis;
 	if (width > guess_size) guess_size = width;
 
-	if (len + guess_size > malloc_len)
-	  {
-	     guess_size += 512;
-	     outp = (char *) SLrealloc(out, len + guess_size + 1);
-	     if (outp == NULL)
-	       {
-		  SLang_set_error (SL_MALLOC_ERROR);
-		  return (out);
-	       }
-	     out = outp;
-	     outp = out + len;
-	     malloc_len = len + guess_size;
-	  }
+	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, guess_size, &len1))
+	  return out;
+	outp = out+len;
 
 	if (use_string)
 	  {

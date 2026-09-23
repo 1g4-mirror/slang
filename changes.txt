@@ -56,6 +56,9 @@ Changes since 2.3.3
 25. modules/chksum.sl+related files: Added 64bit CRC routines and the hmacsum
     function to complement hmac_new/close functions.  The 64 bit CRC
     algorthms include: XZ(default), NVME, EMCA-182, and GO-ISO.
+26. A number of unsigned integer overflow checks were added to fix potential
+    memory corruption issues identified by Claude AI. (Thanks go to Miroslav
+    Lichvar for sending me the report)
 
 {{{ Previous Versions
 
