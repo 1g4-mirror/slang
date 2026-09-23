@@ -60,6 +60,9 @@ Changes since 2.3.3
     memory corruption issues identified by Claude AI. (Thanks go to Miroslav
     Lichvar for sending me the report)
 27. src/_slang.h: Changed `#if _SL_HAS_BUILTIN_OVERFLOW` to `#ifdef _SL_HAS_BUILTIN_OVERFLOW`
+28. src/slermin.c: Avoid a corrupt terminfo file causing the
+    pSLtt_tigetstr function to read past the end of the string table.
+
 
 
 
