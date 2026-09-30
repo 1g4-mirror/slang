@@ -1523,16 +1523,20 @@ extern int _pSLang_check_signals_hook (VOID_STAR);
 #if SLANG_OPTIMIZE_FOR_SPEED
 # ifdef __has_builtin
 #  if __has_builtin(__builtin_add_overflow)
-#   define _SL_HAS_BUILTIN_OVERFLOW 1
+#   define _SL_HAS_BUILTIN_ADD_OVERFLOW 1
+#  endif
+#  if __has_builtin(__builtin_mul_overflow)
+#   define _SL_HAS_BUILTIN_MUL_OVERFLOW 1
 #  endif
 # else
 #  if (defined(__GNUC__) && (__GNUC__ >= 5))
-#   define _SL_HAS_BUILTIN_OVERFLOW 1
+#   define _SL_HAS_BUILTIN_ADD_OVERFLOW 1
+#   define _SL_HAS_BUILTIN_MUL_OVERFLOW 1
 #  endif
 # endif
 #endif
 
-#ifdef NEED_CHECK_UINT_OVERFLOW
+#ifdef NEED_UINT_SUM_OVERFLOW
 /* Add a and b to produce c.  If the sum overflows that of an unsigned int return 1.
  * Otherwise, assign *cp = c and return 0
  */
@@ -1553,7 +1557,29 @@ static _INLINE_ int uint_sum_overflow (size_t a, size_t b, size_t *cp)
    return 0;
 # endif
 }
-#endif
+#endif				       /* NEED_UINT_SUM_OVERFLOW */
+
+#ifdef NEED_UINT_MUL_OVERFLOW
+/* Multiply a and b to produce c.  If the product overflows that of an unsigned int return 1.
+ * Otherwise, assign *cp = c and return 0
+ */
+static _INLINE_ int uint_mul_overflow (size_t a, size_t b, size_t *cp)
+{
+# ifdef _SL_HAS_BUILTIN_MUL_OVERFLOW
+   unsigned int _tmp_res;
+   if (__builtin_mul_overflow(a, b, &_tmp_res)) return 1;
+   *cp = _tmp_res;
+   return 0;
+# else
+   unsigned int uint_max = ~((unsigned int)0);
+
+   IF_UNLIKELY ((b != 0) && (a > uint_max / b))
+     return 1;
+   *cp = a * b;
+   return 0;
+# endif
+}
+#endif				       /* NEED_UINT_MUL_OVERFLOW */
 
 /* This is a macro that permits:
  *

@@ -22,7 +22,7 @@ USA.
 #include <string.h>
 
 #include "slang.h"
-#define NEED_CHECK_UINT_OVERFLOW
+#define NEED_UINT_SUM_OVERFLOW
 #include "_slang.h"
 
 static unsigned char Len_Map[256] =

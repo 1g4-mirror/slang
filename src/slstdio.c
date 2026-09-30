@@ -60,7 +60,7 @@ USA.
 
 /* #define SL_APP_WANTS_FOREACH */
 #include "slang.h"
-#define NEED_CHECK_UINT_OVERFLOW
+#define NEED_UINT_SUM_OVERFLOW
 #include "_slang.h"
 
 #ifdef HAVE_FSEEKO

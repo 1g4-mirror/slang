@@ -25,7 +25,8 @@ USA.
 #include <ctype.h>
 
 #include "slang.h"
-#define NEED_CHECK_UINT_OVERFLOW 1
+#define NEED_UINT_SUM_OVERFLOW 1
+#define NEED_UINT_MUL_OVERFLOW 1
 #include "_slang.h"
 
 #ifndef isdigit
@@ -343,8 +344,11 @@ static int compute_size_for_format (char *format, SLstrlen_Type *num_bytes)
 
    while (1 == (status = parse_a_format (&format, &ft)))
      {
-	size_t dsize = ft.repeat * ft.sizeof_type;
-	if (uint_sum_overflow (size, dsize, &size))
+	size_t dsize;
+
+	/* size += ft.repeat * ft.sizeof_type */
+	if (uint_mul_overflow (ft.repeat, ft.sizeof_type, &dsize)
+	    || uint_sum_overflow (size, dsize, &size))
 	  {
 	     _pSLang_verror (SL_ARITH_OVERFLOW_ERROR, "[un]pack format size is too large");
 	     return -1;

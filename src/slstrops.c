@@ -46,7 +46,7 @@ USA.
 #endif
 
 #include "slang.h"
-#define NEED_CHECK_UINT_OVERFLOW
+#define NEED_UINT_SUM_OVERFLOW
 #include "_slang.h"
 
 /*}}}*/
@@ -1918,7 +1918,7 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 #ifdef HAVE_LONG_LONG
    long long llong_var;
 #endif
-   size_t len = 0, len1, malloc_len = 0, dlen;
+   size_t len = 0, tmp_len, malloc_len = 0, dlen;
    int do_free;
    unsigned int guess_size;
 #if SLANG_HAS_FLOAT
@@ -1943,12 +1943,12 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 	/* p points at '%' or 0 */
 
 	dlen = (p - fmt);
-	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, dlen, &len1))
+	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, dlen, &tmp_len))
 	  return out;
-	/* len1 is len+dlen */
+	/* tmp_len is len+dlen */
 	outp = out + len;
 	strncpy(outp, fmt, dlen);
-	len = len1;
+	len = tmp_len;
 	outp = out + len;
 	*outp = 0;
 	if (ch == 0) break;
@@ -2203,10 +2203,16 @@ static char *SLdo_sprintf (char *fmt) /*{{{*/
 	  }
 	*f++ = ch; *f = 0;
 
-	width = width + precis;
+	/* width = width + precis; */
+	if (uint_sum_overflow (width, precis, &tmp_len))
+	  {
+	     SLang_set_error (SL_MALLOC_ERROR);
+	     return out;
+	  }
+	width = (unsigned int) tmp_len;
 	if (width > guess_size) guess_size = width;
 
-	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, guess_size, &len1))
+	if (-1 == check_and_resize_buffer (&out, &malloc_len, len, guess_size, &tmp_len))
 	  return out;
 	outp = out+len;
 
