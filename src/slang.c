@@ -3463,19 +3463,29 @@ static int do_struct_method (SLFUTURE_CONST char *name, int linenum)
 #endif
 static void trace_dump (SLFUTURE_CONST char *format, char *name, SLang_Object_Type *objs, int n, int dir)
 {
+   char prefix [64];
    unsigned int len;
-   char prefix [52];
+   int trace_save;
 
-   len = Trace_Mode - 1;
+   if (Trace_Mode < 1)
+     return;
+
+   len = (unsigned int)Trace_Mode - 1;
    if (len + 2 >= sizeof (prefix))
      len = sizeof (prefix) - 2;
 
    SLMEMSET (prefix, ' ', len);
    prefix[len] = 0;
 
+   /* Don't trace dump routines to avoid recursion */
+   trace_save = Trace_Mode;
+   Trace_Mode = 0;
    _pSLerr_dump_msg ("%s", prefix);
    _pSLerr_dump_msg (format, name, n);
 
+   (void) objs; (void) dir;
+#if 0
+   /* The intent here is to print the objects, which is wrong a implemented */
    if (n > 0)
      {
 	prefix[len] = ' ';
@@ -3484,6 +3494,8 @@ static void trace_dump (SLFUTURE_CONST char *format, char *name, SLang_Object_Ty
 
 	_pSLerr_dump_msg (prefix, objs, n, dir);
      }
+#endif
+   Trace_Mode = trace_save;
 }
 #if defined(__GNUC__)
 # pragma GCC diagnostic warning "-Wformat-nonliteral"
@@ -4633,8 +4645,8 @@ static void execute_slang_fun (_pSLang_Function_Type *fun, unsigned int linenum)
 	stack_depth = SLstack_depth ();
 
 	if ((Trace_Function != NULL)
-	    && (0 == strcmp (Trace_Function, fun->name))
-	    && (Trace_Mode == 0))
+	    && (Trace_Mode == 0)
+	    && (0 == strcmp (Trace_Function, fun->name)))
 	  Trace_Mode = 1;
 
 	if (Trace_Mode)
@@ -4662,8 +4674,7 @@ static void execute_slang_fun (_pSLang_Function_Type *fun, unsigned int linenum)
 			 stack_depth,
 			 1);
 
-	     if (Trace_Mode == 1)
-	       Trace_Mode = 0;
+	     if (Trace_Mode == 1) Trace_Mode = 0;
 	  }
      }
    else
